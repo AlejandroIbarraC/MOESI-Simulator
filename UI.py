@@ -3,6 +3,7 @@ from tkinter import *
 from Bus import *
 from CPU import *
 import util.InstructionGenerator as Gen
+from util.Util import *
 
 
 class UI:
@@ -644,23 +645,23 @@ class UI:
     def init_cpus(self):
         cpu0 = CPU(0)
         cpu1 = CPU(1)
-        #cpu2 = CPU(2)
-        #cpu3 = CPU(3)
+        cpu2 = CPU(2)
+        cpu3 = CPU(3)
 
-        self.cpus = [cpu0, cpu1]
+        self.cpus = [cpu0, cpu1, cpu2, cpu3]
         self.bus.cpus = self.cpus
+
+        cpu0.debug_instrs = ["WRITE 010 FFFF"]
+        cpu1.debug_instrs = ["CALC", "CALC", "READ 010"]
 
         cpu0.play()
         cpu1.play()
-        #cpu2.play()
-        #cpu3.play()
-
-        self.update_ui_vars()
+        cpu2.play()
+        cpu3.play()
 
         # Thread to update UI vars in real time
-        #update_thread = threading.Thread(target=self.update_ui_vars(), daemon=True)
-        #update_thread.start()
-
+        update_thread = threading.Thread(target=self.update_ui_vars, daemon=True)
+        update_thread.start()
 
     def add_instr(self):
         n_instr = self.entry_instr.get()
@@ -685,7 +686,6 @@ class UI:
 
     def single_step(self):
         print("Single step")
-        self.update_ui_vars()
 
     def start_sim(self):
         print("Start simulation")
@@ -694,73 +694,80 @@ class UI:
         print("Stop simulation")
 
     def update_ui_vars(self):
-        cpu0 = self.cpus[0]
-        self.p0_exec_var.set(cpu0.status)
-        self.p0_c0_state_var.set(str(cpu0.controller.cache.block_0.state))
-        self.p0_c0_address_var.set(str(cpu0.controller.cache.block_0.address))
-        self.p0_c0_data_var.set(str(cpu0.controller.cache.block_0.data))
-        self.p0_c1_state_var.set(str(cpu0.controller.cache.block_1.state))
-        self.p0_c1_address_var.set(str(cpu0.controller.cache.block_1.address))
-        self.p0_c1_data_var.set(str(cpu0.controller.cache.block_1.data))
-        self.p0_c2_state_var.set(str(cpu0.controller.cache.block_2.state))
-        self.p0_c2_address_var.set(str(bin(cpu0.controller.cache.block_2.address)).replace("0b", ""))
-        self.p0_c2_data_var.set(str(cpu0.controller.cache.block_2.data))
-        self.p0_c3_state_var.set(str(cpu0.controller.cache.block_3.state))
-        self.p0_c3_address_var.set(str(bin(cpu0.controller.cache.block_3.address)).replace("0b", ""))
-        self.p0_c3_data_var.set(str(cpu0.controller.cache.block_3.data))
+        while 1:
+            cpu0 = self.cpus[0]
+            self.p0_exec_var.set(cpu0.status)
+            self.p0_last_exec_var.set(cpu0.last_instr)
+            self.p0_c0_state_var.set(str(cpu0.controller.cache.block_0.state))
+            self.p0_c0_address_var.set(dec_to_bin(cpu0.controller.cache.block_0.address))
+            self.p0_c0_data_var.set(dec_to_hex(cpu0.controller.cache.block_0.data))
+            self.p0_c1_state_var.set(str(cpu0.controller.cache.block_1.state))
+            self.p0_c1_address_var.set(dec_to_bin(cpu0.controller.cache.block_1.address))
+            self.p0_c1_data_var.set(dec_to_hex(cpu0.controller.cache.block_1.data))
+            self.p0_c2_state_var.set(str(cpu0.controller.cache.block_2.state))
+            self.p0_c2_address_var.set(dec_to_bin(cpu0.controller.cache.block_2.address))
+            self.p0_c2_data_var.set(dec_to_hex(cpu0.controller.cache.block_2.data))
+            self.p0_c3_state_var.set(str(cpu0.controller.cache.block_3.state))
+            self.p0_c3_address_var.set(dec_to_bin(cpu0.controller.cache.block_3.address))
+            self.p0_c3_data_var.set(dec_to_hex(cpu0.controller.cache.block_3.data))
 
-        cpu1 = self.cpus[1]
-        self.p1_exec_var.set(cpu1.status)
-        self.p1_c0_state_var.set(str(cpu1.controller.cache.block_0.state))
-        self.p1_c0_address_var.set(str(cpu1.controller.cache.block_0.address))
-        self.p1_c0_data_var.set(str(cpu1.controller.cache.block_0.data))
-        self.p1_c1_state_var.set(str(cpu1.controller.cache.block_1.state))
-        self.p1_c1_address_var.set(str(cpu1.controller.cache.block_1.address))
-        self.p1_c1_data_var.set(str(cpu1.controller.cache.block_1.data))
-        self.p1_c2_state_var.set(str(cpu1.controller.cache.block_2.state))
-        self.p1_c2_address_var.set(str(bin(cpu1.controller.cache.block_2.address)).replace("0b", ""))
-        self.p1_c2_data_var.set(str(cpu1.controller.cache.block_2.data))
-        self.p1_c3_state_var.set(str(cpu1.controller.cache.block_3.state))
-        self.p1_c3_address_var.set(str(bin(cpu1.controller.cache.block_3.address)).replace("0b", ""))
-        self.p1_c3_data_var.set(str(cpu1.controller.cache.block_3.data))
+            cpu1 = self.cpus[1]
+            self.p1_exec_var.set(cpu1.status)
+            self.p1_last_exec_var.set(cpu1.last_instr)
+            self.p1_c0_state_var.set(str(cpu1.controller.cache.block_0.state))
+            self.p1_c0_address_var.set(dec_to_bin(cpu1.controller.cache.block_0.address))
+            self.p1_c0_data_var.set(dec_to_hex(cpu1.controller.cache.block_0.data))
+            self.p1_c1_state_var.set(str(cpu1.controller.cache.block_1.state))
+            self.p1_c1_address_var.set(dec_to_bin(cpu1.controller.cache.block_1.address))
+            self.p1_c1_data_var.set(dec_to_hex(cpu1.controller.cache.block_1.data))
+            self.p1_c2_state_var.set(str(cpu1.controller.cache.block_2.state))
+            self.p1_c2_address_var.set(dec_to_bin(cpu1.controller.cache.block_2.address))
+            self.p1_c2_data_var.set(dec_to_hex(cpu1.controller.cache.block_2.data))
+            self.p1_c3_state_var.set(str(cpu1.controller.cache.block_3.state))
+            self.p1_c3_address_var.set(dec_to_bin(cpu1.controller.cache.block_3.address))
+            self.p1_c3_data_var.set(dec_to_hex(cpu1.controller.cache.block_3.data))
 
-        # cpu2 = self.cpus[2]
-        # self.p2_exec_var.set(cpu2.status)
-        # self.p2_c0_state_var.set(str(cpu2.controller.cache.block_0.state))
-        # self.p2_c0_address_var.set(str(cpu2.controller.cache.block_0.address))
-        # self.p2_c0_data_var.set(str(cpu2.controller.cache.block_0.data))
-        # self.p2_c1_state_var.set(str(cpu2.controller.cache.block_1.state))
-        # self.p2_c1_address_var.set(str(cpu2.controller.cache.block_1.address))
-        # self.p2_c1_data_var.set(str(cpu2.controller.cache.block_1.data))
-        # self.p2_c2_state_var.set(str(cpu2.controller.cache.block_2.state))
-        # self.p2_c2_address_var.set(str(bin(cpu2.controller.cache.block_2.address)).replace("0b", ""))
-        # self.p2_c2_data_var.set(str(cpu2.controller.cache.block_2.data))
-        # self.p2_c3_state_var.set(str(cpu2.controller.cache.block_3.state))
-        # self.p2_c3_address_var.set(str(bin(cpu2.controller.cache.block_3.address)).replace("0b", ""))
-        # self.p2_c3_data_var.set(str(cpu2.controller.cache.block_3.data))
-        #
-        # cpu3 = self.cpus[3]
-        # self.p3_exec_var.set(cpu3.status)
-        # self.p3_c0_state_var.set(str(cpu3.controller.cache.block_0.state))
-        # self.p3_c0_address_var.set(str(cpu3.controller.cache.block_0.address))
-        # self.p3_c0_data_var.set(str(cpu3.controller.cache.block_0.data))
-        # self.p3_c1_state_var.set(str(cpu3.controller.cache.block_1.state))
-        # self.p3_c1_address_var.set(str(cpu3.controller.cache.block_1.address))
-        # self.p3_c1_data_var.set(str(cpu3.controller.cache.block_1.data))
-        # self.p3_c2_state_var.set(str(cpu3.controller.cache.block_2.state))
-        # self.p3_c2_address_var.set(str(bin(cpu3.controller.cache.block_2.address)).replace("0b", ""))
-        # self.p3_c2_data_var.set(str(cpu3.controller.cache.block_2.data))
-        # self.p3_c3_state_var.set(str(cpu3.controller.cache.block_3.state))
-        # self.p3_c3_address_var.set(str(bin(cpu3.controller.cache.block_3.address)).replace("0b", ""))
-        # self.p3_c3_data_var.set(str(cpu3.controller.cache.block_3.data))
+            cpu2 = self.cpus[2]
+            self.p2_exec_var.set(cpu2.status)
+            self.p2_last_exec_var.set(cpu2.last_instr)
+            self.p2_c0_state_var.set(str(cpu2.controller.cache.block_0.state))
+            self.p2_c0_address_var.set(dec_to_bin(cpu2.controller.cache.block_0.address))
+            self.p2_c0_data_var.set(dec_to_hex(cpu2.controller.cache.block_0.data))
+            self.p2_c1_state_var.set(str(cpu2.controller.cache.block_1.state))
+            self.p2_c1_address_var.set(dec_to_bin(cpu2.controller.cache.block_1.address))
+            self.p2_c1_data_var.set(dec_to_hex(cpu2.controller.cache.block_1.data))
+            self.p2_c2_state_var.set(str(cpu2.controller.cache.block_2.state))
+            self.p2_c2_address_var.set(dec_to_bin(cpu2.controller.cache.block_2.address))
+            self.p2_c2_data_var.set(dec_to_hex(cpu2.controller.cache.block_2.data))
+            self.p2_c3_state_var.set(str(cpu2.controller.cache.block_3.state))
+            self.p2_c3_address_var.set(dec_to_bin(cpu2.controller.cache.block_3.address))
+            self.p2_c3_data_var.set(dec_to_hex(cpu2.controller.cache.block_3.data))
 
-        mem = self.bus.memory
-        self.mem_b0_var.set(str(mem.block_0.get_data()))
-        self.mem_b1_var.set(str(mem.block_0.get_data()))
-        self.mem_b2_var.set(str(mem.block_0.get_data()))
-        self.mem_b3_var.set(str(mem.block_0.get_data()))
-        self.mem_b4_var.set(str(mem.block_0.get_data()))
-        self.mem_b5_var.set(str(mem.block_0.get_data()))
-        self.mem_b6_var.set(str(mem.block_0.get_data()))
-        self.mem_b7_var.set(str(mem.block_0.get_data()))
+            cpu3 = self.cpus[3]
+            self.p3_exec_var.set(cpu3.status)
+            self.p3_last_exec_var.set(cpu3.last_instr)
+            self.p3_c0_state_var.set(str(cpu3.controller.cache.block_0.state))
+            self.p3_c0_address_var.set(dec_to_bin(cpu3.controller.cache.block_0.address))
+            self.p3_c0_data_var.set(dec_to_hex(cpu3.controller.cache.block_0.data))
+            self.p3_c1_state_var.set(str(cpu3.controller.cache.block_1.state))
+            self.p3_c1_address_var.set(dec_to_bin(cpu3.controller.cache.block_1.address))
+            self.p3_c1_data_var.set(dec_to_hex(cpu3.controller.cache.block_1.data))
+            self.p3_c2_state_var.set(str(cpu3.controller.cache.block_2.state))
+            self.p3_c2_address_var.set(dec_to_bin(cpu3.controller.cache.block_2.address))
+            self.p3_c2_data_var.set(dec_to_hex(cpu3.controller.cache.block_2.data))
+            self.p3_c3_state_var.set(str(cpu3.controller.cache.block_3.state))
+            self.p3_c3_address_var.set(dec_to_bin(cpu3.controller.cache.block_3.address))
+            self.p3_c3_data_var.set(dec_to_hex(cpu3.controller.cache.block_3.data))
+
+            mem = self.bus.memory
+            self.mem_b0_var.set(str(mem.block_0.get_data()))
+            self.mem_b1_var.set(str(mem.block_0.get_data()))
+            self.mem_b2_var.set(str(mem.block_0.get_data()))
+            self.mem_b3_var.set(str(mem.block_0.get_data()))
+            self.mem_b4_var.set(str(mem.block_0.get_data()))
+            self.mem_b5_var.set(str(mem.block_0.get_data()))
+            self.mem_b6_var.set(str(mem.block_0.get_data()))
+            self.mem_b7_var.set(str(mem.block_0.get_data()))
+
+            time.sleep(0.1)
 

@@ -5,9 +5,10 @@ from Cache import Cache
 
 
 class Controller:
-    def __init__(self):
+    def __init__(self, cpu_number):
         self.cache = Cache()
         self.bus = Bus()
+        self.cpu_number = cpu_number
 
     # Checks to see if data is in cache in a valid state
     def find_data(self, address, boolean=False):
@@ -33,26 +34,26 @@ class Controller:
         cache_check = self.find_data(address, boolean=True)
         if cache_check:
             # READ HIT. Data was found on local blocks
-            print("READ HIT")
+            print("CPU " + str(self.cpu_number) + ": READ HIT")
             time.sleep(0.5)
         else:
             # READ MISS. Call bus to get data from somewhere else
-            print("READ MISS. PROBING...")
+            print("CPU " + str(self.cpu_number) + ": READ MISS. PROBING...")
             self.bus.lock_bus()
-            cpus_with_copy = self.bus.find_copies(address)
+            cpus_with_copy = self.bus.find_copies(address, self.cpu_number)
             if len(cpus_with_copy) != 0:
                 # READ HIT ON PROBE
-                print("READ HIT ON PROBE")
+                print("CPU " + str(self.cpu_number) + ": READ HIT ON PROBE")
                 cpu = cpus_with_copy[0]
                 data = cpu.controller.find_data(address)
                 old_info = self.cache.write(address, data, "S")
 
                 # Update all copies with READ HIT PROBE code
-                self.bus.update(address, cpus_with_copy, "RHP")
+                self.bus.update(address, cpus_with_copy, "RHP", self.cpu_number)
             else:
                 # READ MISS ON PROBE. READ FROM MEMORY
-                print("READ MISS ON PROBE. READ FROM MEMORY.")
-                data = self.bus.read_from_mem(address)
+                print("CPU " + str(self.cpu_number) + ": READ MISS ON PROBE. READ FROM MEMORY.")
+                data = self.bus.read_from_mem(address, self.cpu_number)
                 old_info = self.cache.write(address, data, "E")
 
             # Verify that old info is not invalid and write back to memory
@@ -62,7 +63,7 @@ class Controller:
 
             if old_address != address and old_state == "O" or old_state == "M":
                 # Only write back if state is O or M and expulsion is made
-                self.bus.write_to_mem(old_address, old_data)
+                self.bus.write_to_mem(old_address, old_data, self.cpu_number)
 
             self.bus.unlock_bus()
 
@@ -88,8 +89,8 @@ class Controller:
                 # S or O -> M. WRITE on local cache. Tell bus to change copies to I
                 state = "M"
                 old_info = self.cache.write(address, data, state)
-                cpus_with_copy = self.bus.find_copies(address)
-                self.bus.update(address, cpus_with_copy, "WM")
+                cpus_with_copy = self.bus.find_copies(address, self.cpu_number)
+                self.bus.update(address, cpus_with_copy, "WM", self.cpu_number)
 
             # Verify that old info is not invalid and write back to memory
             old_state = old_info[0]
@@ -98,7 +99,7 @@ class Controller:
 
             if old_address != address and old_state == "O" or old_state == "M":
                 # Only write back if state is O or M and expulsion is made
-                self.bus.write_to_mem(old_address, old_data)
+                self.bus.write_to_mem(old_address, old_data, self.cpu_number)
 
             self.bus.unlock_bus()
 
@@ -116,11 +117,11 @@ class Controller:
 
             if old_address != address and old_state == "O" or old_state == "M":
                 # Only write back if state is O or M and expulsion is made
-                self.bus.write_to_mem(old_address, old_data)
+                self.bus.write_to_mem(old_address, old_data, self.cpu_number)
 
             # Invalidate all other copies
-            cpus_with_copy = self.bus.find_copies(address)
-            self.bus.update(address, cpus_with_copy, "WM")
+            cpus_with_copy = self.bus.find_copies(address, self.cpu_number)
+            self.bus.update(address, cpus_with_copy, "WM", self.cpu_number)
 
             self.bus.unlock_bus()
 

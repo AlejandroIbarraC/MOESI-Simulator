@@ -15,15 +15,16 @@ class Bus:
 
         return cls._instance
 
-    # Finds instances of CPUs that have a copy of desired address
-    def find_copies(self, address):
+    # Find instances of CPUs that have a copy of desired address
+    def find_copies(self, address, cpu_number):
         result = []
 
         for cpu in self.cpus:
-            if cpu.controller.find_data(address, boolean=True):
+            # Don't include CPU that is making the update request. It already updated its own cache!
+            if cpu.number != cpu_number and cpu.controller.find_data(address, boolean=True):
                 result.append(cpu)
 
-        print("FOUND COPIES " + str(self.cpus))
+        print("BUS: REQ FROM CPU " + str(cpu_number) + ": FOUND COPIES " + str(result))
 
         return result
 
@@ -32,8 +33,9 @@ class Bus:
         self.lock.acquire()
 
     # Bus reads a data from memory
-    def read_from_mem(self, address):
+    def read_from_mem(self, address, cpu_number):
         result = self.memory.read(address)
+        print("BUS: REQ FROM CPU " + str(cpu_number) + ": READING " + str(address) + " FROM MEMORY")
         return result
 
     # Unlock bus to be used by another instance
@@ -41,21 +43,26 @@ class Bus:
         self.lock.release()
 
     # Updates all processors depending on signal
-    def update(self, address, cpu_list, update_type):
+    def update(self, address, cpu_list, update_type, cpu_number):
         for cpu in cpu_list:
-            print("Updating CPU: " + str(cpu.number) + " memory pos: " + str(address) + " of type: " + str(update_type))
+            print("BUS: REQ FROM CPU " + str(cpu_number) + ": UPDATING CPU: " + str(cpu.number) + " ADDRESS: " + str(address) + " TYPE: " + str(update_type))
             block = cpu.controller.cache.get_block_by_address(address)
             match update_type:
                 case "RHP":
-                    # Change copy with E to S.
-                    if block.get_state() == "E":
-                        block.set_state("S")
+                    # Change copy E -> S and M -> O
+                    block_state = block.get_state()
+                    match block_state:
+                        case "E":
+                            block.set_state("S")
+                        case "M":
+                            block.set_state("O")
                 case "WM":
                     # Change all copies to I
                     block.set_state("I")
 
     # Write to memory from bus
-    def write_to_mem(self, address, data):
+    def write_to_mem(self, address, data, cpu_number):
         self.memory.write(address, data)
+        print("BUS: REQ FROM CPU " + str(cpu_number) + ": WRITING " + str(data) + " TO ADDRESS " + str(address))
 
 

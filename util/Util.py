@@ -1,6 +1,6 @@
 # Collection of utility functions
 
-# Converts decimal number to binary
+# Converts decimal number to 3 bit binary
 def dec_to_bin(num):
     # Convert number to binary string and remove 0b prefix
     result = bin(num).replace("0b", "")
@@ -12,7 +12,7 @@ def dec_to_bin(num):
     return result
 
 
-# Converts decimal number to hexadecimal
+# Converts decimal number to 4 bit hexadecimal
 def dec_to_hex(num):
     # Convert number to hex string and remove 0x prefix
     result = hex(num).replace("0x", "")

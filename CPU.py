@@ -7,12 +7,13 @@ import util.InstructionGenerator as Gen
 
 class CPU:
     def __init__(self, number):
-        self.controller = Controller()
-        self.running = True
         self.number = number
+        self.controller = Controller(self.number)
+        self.running = True
 
-        self.debug_instrs = ["READ 111"]
+        self.debug_instrs = []
         self.status = "Idle"
+        self.last_instr = " - "
 
     # Analyzes string instruction and converts it to list format
     def analyze_instruction(self, instr):
@@ -40,23 +41,24 @@ class CPU:
     def thread_clock(self):
         for instr in self.debug_instrs:
             decoded_instr = self.analyze_instruction(instr)
+            self.last_instr = self.status
             self.status = instr
             if len(decoded_instr) > 0:
                 operation = decoded_instr[0]
                 if operation == "CALC":
-                    print("Decoded CALC")
+                    print("CPU " + str(self.number) + ": DECODED CALC")
                 elif operation == "READ":
-                    print("Decoded READ")
                     address = decoded_instr[1]
+                    print("CPU " + str(self.number) + ": DECODED READ " + str(address))
                     self.controller.read(address)
                 else:
-                    print("Decoded WRITE")
                     address = decoded_instr[1]
                     data = decoded_instr[2]
+                    print("CPU " + str(self.number) + ": DECODED WRITE " + str(address) + " " + str(data))
                     self.controller.write(address, data)
                 time.sleep(1)
             else:
-                print("Error with instruction " + instr)
+                print("ERROR DECODING " + instr)
 
     # Main entry point to start CPU
     def play(self):
