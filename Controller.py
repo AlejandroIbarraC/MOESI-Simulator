@@ -124,6 +124,3 @@ class Controller:
             self.bus.update(address, cpus_with_copy, "WM", self.cpu_number)
 
             self.bus.unlock_bus()
-
-
-

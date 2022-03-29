@@ -110,4 +110,3 @@ class CPU:
             self.is_running = False
         else:
             print("CPU " + str(self.number) + " is already stopped!")
-

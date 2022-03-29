@@ -64,5 +64,3 @@ class Bus:
     def write_to_mem(self, address, data, cpu_number):
         self.memory.write(address, data)
         print("BUS: REQ FROM CPU " + str(cpu_number) + ": WRITING " + str(data) + " TO ADDRESS " + str(address))
-
-

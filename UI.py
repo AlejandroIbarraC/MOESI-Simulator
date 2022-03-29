@@ -218,8 +218,10 @@ class UI:
         var_font = ("Arial", 11, "bold")
 
         # Title label
-        label_title = Label(self.master, text="MOESI Simulator", font=("Arial", 18))
+        label_title = Label(self.master, text="MOESI Simulator", font=("Arial", 18, "bold"))
         label_title.place(x=20, y=10)
+        credit_title = Label(self.master, text="by J.A Ibarra", font=("Arial", 14, "italic"))
+        credit_title.place(x=225, y=14)
 
         # Processor 0 Labels
         label_p0_title = Label(self.master, text="CPU 0", font=("Arial", 14))
@@ -808,4 +810,3 @@ class UI:
             self.mem_b7_var.set(dec_to_hex(mem.block_7.get_data()))
 
             time.sleep(0.1)
-

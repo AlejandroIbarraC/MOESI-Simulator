@@ -31,4 +31,3 @@ class CacheBlock:
 
     def check_empty(self):
         return self.address == 0 and self.data == 0 and self.state == "I"
-
