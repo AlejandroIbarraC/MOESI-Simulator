@@ -1,4 +1,6 @@
+
 from tkinter import *
+from tkinter import ttk
 
 from Bus import *
 from CPU import *
@@ -8,10 +10,11 @@ from util.Util import *
 
 class UI:
     def __init__(self, master):
+        # Tkinter window components
         self.master: Tk = master
         self.master.title("MOESI Simulator")
-        self.master.minsize(1500, 900)
-        self.master.maxsize(1500, 900)
+        self.master.geometry("1500x900")
+        self.master.resizable(False, False)
 
         # Define string variables
         # Processor 0
@@ -177,8 +180,18 @@ class UI:
         self.mem_b7_var.set("M7")
 
         # Entries
-        self.entry_instr = Entry(self.master, width=30)
-        self.entry_instr.place(x=1250, y=280)
+        self.entry_instr = Entry(self.master, width=18)
+        self.entry_instr.place(x=1320, y=280)
+
+        # Combobox
+        self.selected_processor = "P0"
+        self.processor_cb = ttk.Combobox(self.master)
+        self.processor_cb["values"] = ("P0", "P1", "P2", "P3")
+        self.processor_cb.set(self.selected_processor)
+        self.processor_cb.bind("<<ComboboxSelected>>", self.update_processor_cb)
+        self.processor_cb["state"] = "readonly"
+        self.processor_cb.configure(width=6)
+        self.processor_cb.place(x=1250, y=280)
 
         # DEBUG ELEMENTS
         # Entries
@@ -187,7 +200,7 @@ class UI:
 
         # Variables
         self.instr_time = StringVar()
-        self.instr_time.set("SEC")
+        self.instr_time.set(str(1))
         self.cpus = []
         self.bus = Bus()
 
@@ -615,7 +628,7 @@ class UI:
 
         button_start = Button(self.master, text="Start Simulation", command=self.start_sim, width=25)
         button_stop = Button(self.master, text="Stop Simulation", command=self.stop_sim, width=25)
-        button_single_step = Button(self.master, text="Single step", command=self.single_step, width=25)
+        button_single_step = Button(self.master, text="Single Step", command=self.single_step, width=25)
         label_entry_instr_title = Label(self.master, text="Custom instruction:", font=("Arial", 12))
         button_add_instr = Button(self.master, text="Add", command=self.add_instr, width=25)
 
@@ -625,6 +638,7 @@ class UI:
         label_entry_instr_title.place(x=1245, y=240)
         button_add_instr.place(x=1250, y=315)
 
+    # Tkinter Debug UI labels and components
     def init_ui_debug(self):
         label_debug_title = Label(self.master, text="Debug Options", font=("Arial", 14, "bold"))
         label_debug_title.place(x=1250, y=400)
@@ -642,22 +656,21 @@ class UI:
         button = Button(self.master, text="Generate Instruction", command=self.gen_test, width=25)
         button.place(x=1250, y=630)
 
+    # Initialize CPU instances
     def init_cpus(self):
+        # Create CPU instances
         cpu0 = CPU(0)
         cpu1 = CPU(1)
         cpu2 = CPU(2)
         cpu3 = CPU(3)
 
+        # Store them in a local list and send them to the bus
         self.cpus = [cpu0, cpu1, cpu2, cpu3]
         self.bus.cpus = self.cpus
 
-        cpu0.debug_instrs = ["WRITE 010 FFFF"]
-        cpu1.debug_instrs = ["CALC", "CALC", "READ 010"]
-
-        cpu0.play()
-        cpu1.play()
-        cpu2.play()
-        cpu3.play()
+        # Debug instruction mode
+        # cpu0.debug_instrs = ["WRITE 010 FFFF"]
+        # cpu1.debug_instrs = ["CALC", "CALC", "READ 010", "WRITE 010 0010"]
 
         # Thread to update UI vars in real time
         update_thread = threading.Thread(target=self.update_ui_vars, daemon=True)
@@ -667,7 +680,17 @@ class UI:
         n_instr = self.entry_instr.get()
         if len(n_instr) > 0:
             self.entry_instr.delete(0, END)
-            print("Add Instruction: " + n_instr)
+            cpu_name = self.selected_processor
+            print("UI: ADDED INSTRUCTION " + cpu_name + ": " + n_instr)
+            match cpu_name:
+                case "P0":
+                    self.cpus[0].set_custom_instr(n_instr)
+                case "P1":
+                    self.cpus[1].set_custom_instr(n_instr)
+                case "P2":
+                    self.cpus[2].set_custom_instr(n_instr)
+                case "P3":
+                    self.cpus[3].set_custom_instr(n_instr)
         else:
             print("No instruction written")
 
@@ -675,24 +698,39 @@ class UI:
         n_time = self.entry_instr_time.get()
         if len(n_time) > 0:
             self.entry_instr_time.delete(0, END)
-            print("Change time to: " + n_time)
+            self.instr_time.set(n_time)
+            for cpu in self.cpus:
+                cpu.set_instr_time(n_time)
         else:
             print("No time written")
 
+    # Debug test to check random instruction generator
     def gen_test(self):
         instr = Gen.generate_random_instruction()
         print(instr)
-        self.p0_exec_var.set(instr)
 
+    # Single step mode. Each CPU generates a single instruction and executes it
     def single_step(self):
-        print("Single step")
+        for cpu in self.cpus:
+            cpu.play(True)
 
+    # Continuous execution mode. Each CPU generates multiple infinite random instructions and executes them
     def start_sim(self):
-        print("Start simulation")
+        for cpu in self.cpus:
+            cpu.play()
 
+    # Pauses/Stops the simulation
     def stop_sim(self):
-        print("Stop simulation")
+        for cpu in self.cpus:
+            cpu.stop()
 
+    # Called when combobox of processor selection is changes
+    def update_processor_cb(self, *args):
+        n_value = self.processor_cb.get()
+        self.selected_processor = n_value
+        print(n_value)
+
+    # Called by thread to update all UI variables
     def update_ui_vars(self):
         while 1:
             cpu0 = self.cpus[0]
@@ -760,14 +798,14 @@ class UI:
             self.p3_c3_data_var.set(dec_to_hex(cpu3.controller.cache.block_3.data))
 
             mem = self.bus.memory
-            self.mem_b0_var.set(str(mem.block_0.get_data()))
-            self.mem_b1_var.set(str(mem.block_0.get_data()))
-            self.mem_b2_var.set(str(mem.block_0.get_data()))
-            self.mem_b3_var.set(str(mem.block_0.get_data()))
-            self.mem_b4_var.set(str(mem.block_0.get_data()))
-            self.mem_b5_var.set(str(mem.block_0.get_data()))
-            self.mem_b6_var.set(str(mem.block_0.get_data()))
-            self.mem_b7_var.set(str(mem.block_0.get_data()))
+            self.mem_b0_var.set(dec_to_hex(mem.block_0.get_data()))
+            self.mem_b1_var.set(dec_to_hex(mem.block_1.get_data()))
+            self.mem_b2_var.set(dec_to_hex(mem.block_2.get_data()))
+            self.mem_b3_var.set(dec_to_hex(mem.block_3.get_data()))
+            self.mem_b4_var.set(dec_to_hex(mem.block_4.get_data()))
+            self.mem_b5_var.set(dec_to_hex(mem.block_5.get_data()))
+            self.mem_b6_var.set(dec_to_hex(mem.block_6.get_data()))
+            self.mem_b7_var.set(dec_to_hex(mem.block_7.get_data()))
 
             time.sleep(0.1)
 
