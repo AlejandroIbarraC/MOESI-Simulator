@@ -1,6 +1,5 @@
-import random
-
 from CacheBlock import CacheBlock
+from InstructionGenerator import *
 
 
 class Cache:
@@ -54,7 +53,8 @@ class Cache:
                 self.block_1.set_data(data)
                 self.block_1.set_state(state)
             else:
-                match random.randint(0, 1):
+                b_random = binomial_random(1, 0.5)
+                match b_random:
                     case 0:
                         old_info = [self.block_0.get_state(), self.block_0.address, self.block_0.get_data()]
                         self.block_0.set_address(address)
@@ -78,7 +78,8 @@ class Cache:
                 self.block_3.set_data(data)
                 self.block_3.set_state(state)
             else:
-                match random.randint(0, 1):
+                b_random = binomial_random(1, 0.5)
+                match b_random:
                     case 0:
                         old_info = [self.block_2.get_state(), self.block_2.address, self.block_2.get_data()]
                         self.block_2.set_address(address)

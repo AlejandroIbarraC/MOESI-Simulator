@@ -1,4 +1,5 @@
 import threading
+import time
 
 from Memory import *
 
@@ -36,6 +37,9 @@ class Bus:
     def read_from_mem(self, address, cpu_number):
         result = self.memory.read(address)
         print("BUS: REQ FROM CPU " + str(cpu_number) + ": READING " + str(address) + " FROM MEMORY")
+
+        # Fake memory time penalty
+        time.sleep(1)
         return result
 
     # Unlock bus to be used by another instance
@@ -64,3 +68,6 @@ class Bus:
     def write_to_mem(self, address, data, cpu_number):
         self.memory.write(address, data)
         print("BUS: REQ FROM CPU " + str(cpu_number) + ": WRITING " + str(data) + " TO ADDRESS " + str(address))
+
+        # Fake memory time penalty
+        time.sleep(1)

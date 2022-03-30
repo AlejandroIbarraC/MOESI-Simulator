@@ -1,4 +1,3 @@
-
 from tkinter import *
 from tkinter import ttk
 
@@ -678,12 +677,19 @@ class UI:
         update_thread = threading.Thread(target=self.update_ui_vars, daemon=True)
         update_thread.start()
 
+    # Called by add custom instruction button
     def add_instr(self):
+        # Get value from entry
         n_instr = self.entry_instr.get()
+
         if len(n_instr) > 0:
+            # Delete stuff from entry
             self.entry_instr.delete(0, END)
+
+            # Get procesor name from combobox
             cpu_name = self.selected_processor
             print("UI: ADDED INSTRUCTION " + cpu_name + ": " + n_instr)
+
             match cpu_name:
                 case "P0":
                     self.cpus[0].set_custom_instr(n_instr)
@@ -696,14 +702,23 @@ class UI:
         else:
             print("No instruction written")
 
+    # Change the time an instruction takes to be executed by each CPU
     def change_instr_time(self):
+        # Get new time from entry
         n_time = self.entry_instr_time.get()
-        if len(n_time) > 0:
+
+        if int(n_time) > 0:
+            # Delete stuff from entry
             self.entry_instr_time.delete(0, END)
+
+            # Set new instruction time UI variable
             self.instr_time.set(n_time)
+
+            # Change instruction time for each CPU
             for cpu in self.cpus:
                 cpu.set_instr_time(n_time)
         else:
+            # User wrote an invalid time
             print("No time written")
 
     # Debug test to check random instruction generator
@@ -713,28 +728,35 @@ class UI:
 
     # Single step mode. Each CPU generates a single instruction and executes it
     def single_step(self):
+        # Start each CPU in single step mode (True flag)
         for cpu in self.cpus:
             cpu.play(True)
 
     # Continuous execution mode. Each CPU generates multiple infinite random instructions and executes them
     def start_sim(self):
+        # Start every CPU
         for cpu in self.cpus:
             cpu.play()
 
     # Pauses/Stops the simulation
     def stop_sim(self):
+        # Stop every CPU
         for cpu in self.cpus:
             cpu.stop()
 
     # Called when combobox of processor selection is changes
     def update_processor_cb(self, *args):
+        # Get new value from combobox
         n_value = self.processor_cb.get()
+
+        # Set new value to selected processor object variable
         self.selected_processor = n_value
         print(n_value)
 
     # Called by thread to update all UI variables
     def update_ui_vars(self):
         while 1:
+            # CPU 0 variables
             cpu0 = self.cpus[0]
             self.p0_exec_var.set(cpu0.status)
             self.p0_last_exec_var.set(cpu0.last_instr)
@@ -751,6 +773,7 @@ class UI:
             self.p0_c3_address_var.set(dec_to_bin(cpu0.controller.cache.block_3.address))
             self.p0_c3_data_var.set(dec_to_hex(cpu0.controller.cache.block_3.data))
 
+            # CPU 1 variables
             cpu1 = self.cpus[1]
             self.p1_exec_var.set(cpu1.status)
             self.p1_last_exec_var.set(cpu1.last_instr)
@@ -767,6 +790,7 @@ class UI:
             self.p1_c3_address_var.set(dec_to_bin(cpu1.controller.cache.block_3.address))
             self.p1_c3_data_var.set(dec_to_hex(cpu1.controller.cache.block_3.data))
 
+            # CPU 2 variables
             cpu2 = self.cpus[2]
             self.p2_exec_var.set(cpu2.status)
             self.p2_last_exec_var.set(cpu2.last_instr)
@@ -783,6 +807,7 @@ class UI:
             self.p2_c3_address_var.set(dec_to_bin(cpu2.controller.cache.block_3.address))
             self.p2_c3_data_var.set(dec_to_hex(cpu2.controller.cache.block_3.data))
 
+            # CPU 3 variables
             cpu3 = self.cpus[3]
             self.p3_exec_var.set(cpu3.status)
             self.p3_last_exec_var.set(cpu3.last_instr)
@@ -799,6 +824,7 @@ class UI:
             self.p3_c3_address_var.set(dec_to_bin(cpu3.controller.cache.block_3.address))
             self.p3_c3_data_var.set(dec_to_hex(cpu3.controller.cache.block_3.data))
 
+            # Memory variables
             mem = self.bus.memory
             self.mem_b0_var.set(dec_to_hex(mem.block_0.get_data()))
             self.mem_b1_var.set(dec_to_hex(mem.block_1.get_data()))
@@ -809,4 +835,5 @@ class UI:
             self.mem_b6_var.set(dec_to_hex(mem.block_6.get_data()))
             self.mem_b7_var.set(dec_to_hex(mem.block_7.get_data()))
 
+            # Update thread every 0.1s
             time.sleep(0.1)
