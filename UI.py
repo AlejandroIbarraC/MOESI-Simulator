@@ -707,7 +707,7 @@ class UI:
         # Get new time from entry
         n_time = self.entry_instr_time.get()
 
-        if int(n_time) > 0:
+        if float(n_time) > 0:
             # Delete stuff from entry
             self.entry_instr_time.delete(0, END)
 
@@ -760,16 +760,16 @@ class UI:
             cpu0 = self.cpus[0]
             self.p0_exec_var.set(cpu0.status)
             self.p0_last_exec_var.set(cpu0.last_instr)
-            self.p0_c0_state_var.set(str(cpu0.controller.cache.block_0.state))
+            self.p0_c0_state_var.set(cpu0.controller.cache.block_0.state)
             self.p0_c0_address_var.set(dec_to_bin(cpu0.controller.cache.block_0.address))
             self.p0_c0_data_var.set(dec_to_hex(cpu0.controller.cache.block_0.data))
             self.p0_c1_state_var.set(str(cpu0.controller.cache.block_1.state))
             self.p0_c1_address_var.set(dec_to_bin(cpu0.controller.cache.block_1.address))
             self.p0_c1_data_var.set(dec_to_hex(cpu0.controller.cache.block_1.data))
-            self.p0_c2_state_var.set(str(cpu0.controller.cache.block_2.state))
+            self.p0_c2_state_var.set(cpu0.controller.cache.block_2.state)
             self.p0_c2_address_var.set(dec_to_bin(cpu0.controller.cache.block_2.address))
             self.p0_c2_data_var.set(dec_to_hex(cpu0.controller.cache.block_2.data))
-            self.p0_c3_state_var.set(str(cpu0.controller.cache.block_3.state))
+            self.p0_c3_state_var.set(cpu0.controller.cache.block_3.state)
             self.p0_c3_address_var.set(dec_to_bin(cpu0.controller.cache.block_3.address))
             self.p0_c3_data_var.set(dec_to_hex(cpu0.controller.cache.block_3.data))
 
@@ -777,16 +777,16 @@ class UI:
             cpu1 = self.cpus[1]
             self.p1_exec_var.set(cpu1.status)
             self.p1_last_exec_var.set(cpu1.last_instr)
-            self.p1_c0_state_var.set(str(cpu1.controller.cache.block_0.state))
+            self.p1_c0_state_var.set(cpu1.controller.cache.block_0.state)
             self.p1_c0_address_var.set(dec_to_bin(cpu1.controller.cache.block_0.address))
             self.p1_c0_data_var.set(dec_to_hex(cpu1.controller.cache.block_0.data))
-            self.p1_c1_state_var.set(str(cpu1.controller.cache.block_1.state))
+            self.p1_c1_state_var.set(cpu1.controller.cache.block_1.state)
             self.p1_c1_address_var.set(dec_to_bin(cpu1.controller.cache.block_1.address))
             self.p1_c1_data_var.set(dec_to_hex(cpu1.controller.cache.block_1.data))
-            self.p1_c2_state_var.set(str(cpu1.controller.cache.block_2.state))
+            self.p1_c2_state_var.set(cpu1.controller.cache.block_2.state)
             self.p1_c2_address_var.set(dec_to_bin(cpu1.controller.cache.block_2.address))
             self.p1_c2_data_var.set(dec_to_hex(cpu1.controller.cache.block_2.data))
-            self.p1_c3_state_var.set(str(cpu1.controller.cache.block_3.state))
+            self.p1_c3_state_var.set(cpu1.controller.cache.block_3.state)
             self.p1_c3_address_var.set(dec_to_bin(cpu1.controller.cache.block_3.address))
             self.p1_c3_data_var.set(dec_to_hex(cpu1.controller.cache.block_3.data))
 
@@ -794,16 +794,16 @@ class UI:
             cpu2 = self.cpus[2]
             self.p2_exec_var.set(cpu2.status)
             self.p2_last_exec_var.set(cpu2.last_instr)
-            self.p2_c0_state_var.set(str(cpu2.controller.cache.block_0.state))
+            self.p2_c0_state_var.set(cpu2.controller.cache.block_0.state)
             self.p2_c0_address_var.set(dec_to_bin(cpu2.controller.cache.block_0.address))
             self.p2_c0_data_var.set(dec_to_hex(cpu2.controller.cache.block_0.data))
-            self.p2_c1_state_var.set(str(cpu2.controller.cache.block_1.state))
+            self.p2_c1_state_var.set(cpu2.controller.cache.block_1.state)
             self.p2_c1_address_var.set(dec_to_bin(cpu2.controller.cache.block_1.address))
             self.p2_c1_data_var.set(dec_to_hex(cpu2.controller.cache.block_1.data))
-            self.p2_c2_state_var.set(str(cpu2.controller.cache.block_2.state))
+            self.p2_c2_state_var.set(cpu2.controller.cache.block_2.state)
             self.p2_c2_address_var.set(dec_to_bin(cpu2.controller.cache.block_2.address))
             self.p2_c2_data_var.set(dec_to_hex(cpu2.controller.cache.block_2.data))
-            self.p2_c3_state_var.set(str(cpu2.controller.cache.block_3.state))
+            self.p2_c3_state_var.set(cpu2.controller.cache.block_3.state)
             self.p2_c3_address_var.set(dec_to_bin(cpu2.controller.cache.block_3.address))
             self.p2_c3_data_var.set(dec_to_hex(cpu2.controller.cache.block_3.data))
 
@@ -811,16 +811,16 @@ class UI:
             cpu3 = self.cpus[3]
             self.p3_exec_var.set(cpu3.status)
             self.p3_last_exec_var.set(cpu3.last_instr)
-            self.p3_c0_state_var.set(str(cpu3.controller.cache.block_0.state))
+            self.p3_c0_state_var.set(cpu3.controller.cache.block_0.state)
             self.p3_c0_address_var.set(dec_to_bin(cpu3.controller.cache.block_0.address))
             self.p3_c0_data_var.set(dec_to_hex(cpu3.controller.cache.block_0.data))
-            self.p3_c1_state_var.set(str(cpu3.controller.cache.block_1.state))
+            self.p3_c1_state_var.set(cpu3.controller.cache.block_1.state)
             self.p3_c1_address_var.set(dec_to_bin(cpu3.controller.cache.block_1.address))
             self.p3_c1_data_var.set(dec_to_hex(cpu3.controller.cache.block_1.data))
-            self.p3_c2_state_var.set(str(cpu3.controller.cache.block_2.state))
+            self.p3_c2_state_var.set(cpu3.controller.cache.block_2.state)
             self.p3_c2_address_var.set(dec_to_bin(cpu3.controller.cache.block_2.address))
             self.p3_c2_data_var.set(dec_to_hex(cpu3.controller.cache.block_2.data))
-            self.p3_c3_state_var.set(str(cpu3.controller.cache.block_3.state))
+            self.p3_c3_state_var.set(cpu3.controller.cache.block_3.state)
             self.p3_c3_address_var.set(dec_to_bin(cpu3.controller.cache.block_3.address))
             self.p3_c3_data_var.set(dec_to_hex(cpu3.controller.cache.block_3.data))
 

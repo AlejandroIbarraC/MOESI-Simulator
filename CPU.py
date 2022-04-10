@@ -19,17 +19,34 @@ class CPU:
     # Analyzes string instruction and converts it to list format
     def analyze_instruction(self, instr):
         first_char = instr[0]
+        result = []
 
         match first_char:
             case "R":
-                address = int(instr[5:], 2)
-                result = ["READ", address]
+                try:
+                    if len(instr) == 8:
+                        # READ XXX has 8 characters
+                        address = int(instr[5:], 2)
+                        result = ["READ", address]
+                except ValueError:
+                    # Catch if user tries to enter weird things
+                    result = []
             case "W":
-                address = int(instr[6:9], 2)
-                data = int(instr[10:], 16)
-                result = ["WRITE", address, data]
+                try:
+                    if len(instr) == 14:
+                        # WRITE XXX;XXXX has 14 characters
+                        address = int(instr[6:9], 2)
+                        data = int(instr[10:], 16)
+                        result = ["WRITE", address, data]
+                except ValueError:
+                    # Catch if user tries to enter weird things
+                    result = []
             case "C":
-                result = ["CALC"]
+                try:
+                    if len(instr) == 4:
+                        result = ["CALC"]
+                except ValueError:
+                    result = []
             case _:
                 result = []
 
@@ -83,6 +100,7 @@ class CPU:
             time.sleep(self.instr_time)
         else:
             print("CPU: " + str(self.number) + ": ERROR DECODING " + str(instr))
+            self.status = "Decoding error"
 
     # Main entry point to start CPU
     def play(self, single_step=False):
